@@ -9,15 +9,18 @@ app.use(bodyParser.urlencoded({extended:true}));
 app.use(express.static("public")); //imports the static public folder.
 
 
+//Variables
+let items = [];
+const auth = "#";     // Enter Mongodb Auth here.
+
+
 //Mongoose.
-mongoose.connect("mongodb+srv://samarabp7:Goose1@cluster0.yp51xla.mongodb.net/todoList?retryWrites=true&w=majority");
+mongoose.connect("mongodb+srv://samarabp7:auth@cluster0.yp51xla.mongodb.net/todoList?retryWrites=true&w=majority");
                     //           username:auth                               Database
 
 const itemsSchema = new mongoose.Schema({name: String});
 const Item = mongoose.model("item", itemsSchema);
 
-//Variables
-let items = [];
 
 // Home.
 app.get("/", function(req, res){
