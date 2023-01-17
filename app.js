@@ -15,7 +15,7 @@ const auth = "#";     // Enter Mongodb Auth here.
 
 
 //Mongoose.
-mongoose.connect("mongodb+srv://samarabp7:auth@cluster0.yp51xla.mongodb.net/todoList?retryWrites=true&w=majority");
+mongoose.connect("mongodb+srv://samarabp7:" + auth + "@cluster0.yp51xla.mongodb.net/todoList?retryWrites=true&w=majority");
                     //           username:auth                               Database
 
 const itemsSchema = new mongoose.Schema({name: String});
