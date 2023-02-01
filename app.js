@@ -10,7 +10,7 @@ app.use(express.static("public")); //imports the static public folder.
 
 
 //Variables
-const auth = "Goose1";     // Enter Mongodb Auth here.
+const auth = "#";     // Enter Mongodb Auth here.
 
 
 //Mongoose.
