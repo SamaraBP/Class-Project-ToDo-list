@@ -10,8 +10,7 @@ app.use(express.static("public")); //imports the static public folder.
 
 
 //Variables
-let items = [];
-const auth = "#";     // Enter Mongodb Auth here.
+const auth = "Goose1";     // Enter Mongodb Auth here.
 
 
 //Mongoose.
@@ -50,6 +49,19 @@ app.post("/", function(req, res){
     res.redirect("/");
 });
 
+app.post("/delete", function(req, res){
+    const deleteId = req.body.checkbox;
+    console.log(deleteId);
+    Item.findByIdAndRemove(deleteId, function(err){
+        if (err){
+            console.log(err);
+        } else {
+            console.log("Deleted 1.");
+        }
+    });
+
+    res.redirect("/");
+});
 
 
 
