@@ -10,15 +10,25 @@ app.use(express.static("public")); //imports the static public folder.
 
 
 //Variables
-const auth = "#";     // Enter Mongodb Auth here.
+const auth = "Goose1";     // Enter Mongodb Auth here.
+
+const item1 = {name: "Welcome to your list!"};
+const item2 = {name: "Please add items below."}
+const defaultItems = [item1, item2];
 
 
 //Mongoose.
 mongoose.connect("mongodb+srv://samarabp7:" + auth + "@cluster0.yp51xla.mongodb.net/todoList?retryWrites=true&w=majority");
-                    //           username:auth                               Database
+                    //           username:auth                                       Database
 
 const itemsSchema = new mongoose.Schema({name: String});
+const listsSchema = new mongoose.Schema({
+    name : String,
+    items : [itemsSchema]
+});
+
 const Item = mongoose.model("item", itemsSchema);
+const List = mongoose.model("list", listsSchema);
 
 
 // Home.
@@ -28,30 +38,76 @@ app.get("/", function(req, res){
         if (err){
             console.log(err)
         } else {
-            res.render("index", {items: results});
+            // res.render("index", {items: results});
+            res.render("index", {listTitle : "Today", items : results});
         }
     });
 });
 
+//Custom routing.
+app.get("/:customListName", function(req, res){
+
+    const customList = req.params.customListName;
+    List.findOne({name : customList}, function(err, results){
+        if (!err){
+            if (!results){
+                console.log("entered making new custom list.");
+                //Create new list.
+                const list = new List({
+                    name : customList,
+                    items : defaultItems
+                });
+            
+                list.save();
+                res.redirect("/" + customList);
+
+            } else {
+
+                //Display existing list.
+                res.render("index", {listTitle : results.name, items : results.items});
+            }
+        }
+    });
+});
+
+
+
+//Adds items.
 app.post("/", function(req, res){
 
     var tempItem = req.body.newItem;
     const itemToAdd = new Item({name: tempItem});
+    const listName = req.body.button;
 
-    Item.insertMany(itemToAdd, function(err){
-        if(err) {
-            console.log(err);
-        } else {
-            console.log("Added to DB.");
-        }
-    });
+    console.log(listName);
 
-    res.redirect("/");
+    if (listName == "Today"){
+
+        // saves root route.
+        itemToAdd.save();
+        res.redirect("/");
+
+    } else {
+
+        // Saves to custom route.
+        List.findOne({name : listName}, function(err, results){
+            if (err){
+                console.log(err);
+            } else {
+                results.items.push(itemToAdd);
+                results.save();
+
+                console.log(results.items);
+            }
+        });
+        res.redirect("/" + listName);       // Redirecting too quickly? due to cloud and not local db.
+    }
 });
 
+//Removes items.
 app.post("/delete", function(req, res){
     const deleteId = req.body.checkbox;
-    console.log(deleteId);
+
     Item.findByIdAndRemove(deleteId, function(err){
         if (err){
             console.log(err);
