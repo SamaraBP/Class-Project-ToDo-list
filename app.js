@@ -90,17 +90,20 @@ app.post("/", function(req, res){
     } else {
 
         // Saves to custom route.
-        List.findOne({name : listName}, function(err, results){
+        List.findOne({name : listName}, async function(err, results){
             if (err){
                 console.log(err);
             } else {
                 results.items.push(itemToAdd);
-                results.save();
+                const done = await results.save();
 
-                console.log(results.items);
+                if (done === results){  // Checking if the database looks like the data I just sent it.
+                    res.redirect("/" + listName); 
+                } else {
+                    console.log("ERROR with await.");
+                }
             }
         });
-        res.redirect("/" + listName);       // Redirecting too quickly? due to cloud and not local db.
     }
 });
 
