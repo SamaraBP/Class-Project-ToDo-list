@@ -39,7 +39,7 @@ app.get("/", function(req, res){
             console.log(err)
         } else {
             // res.render("index", {items: results});
-            res.render("index", {listTitle : "Today", items : results});
+            res.render("index", {listTitle : "Today", items : results});       
         }
     });
 });
@@ -64,7 +64,7 @@ app.get("/:customListName", function(req, res){
             } else {
 
                 //Display existing list.
-                res.render("index", {listTitle : results.name, items : results.items});
+                res.render("index", {listTitle : results.name, items : results.items});   
             }
         }
     });
@@ -110,16 +110,30 @@ app.post("/", function(req, res){
 //Removes items.
 app.post("/delete", function(req, res){
     const deleteId = req.body.checkbox;
+    const listName = req.body.listName;
 
-    Item.findByIdAndRemove(deleteId, function(err){
-        if (err){
-            console.log(err);
-        } else {
-            console.log("Deleted 1.");
-        }
-    });
+    console.log(listName);
 
-    res.redirect("/");
+    if (listName == " Today"){                                
+
+        Item.findByIdAndRemove(deleteId, function(err){
+            if (err){
+                console.log(err);
+            } else {
+                console.log("Deleted 1.");
+            }
+        });
+    
+        res.redirect("/");
+    } else {
+        List.findOneAndUpdate({name: listName}, { $pull: {items: {_id: deleteId}}}, function(err, results){
+            if (!err){
+                res.redirect("/" + listName);
+            } else {
+                console.log(err);
+            }
+        });
+    }
 });
 
 
